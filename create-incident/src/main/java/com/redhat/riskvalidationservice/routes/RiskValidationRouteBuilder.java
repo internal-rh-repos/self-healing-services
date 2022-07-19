@@ -42,22 +42,22 @@ public class RiskValidationRouteBuilder extends RouteBuilder {
 			.bean(RiskValidationBean.class,"prepareAnsibleRequest")
 			.log("${body}")
 					.to("kafka:"+"crtincident"+ "?brokers=" + kafkaBootstrap);
-//
-//			from("kafka:" + "crtincident" + "?brokers=" + kafkaBootstrap + "&maxPollRecords="
-//					+ consumerMaxPollRecords + "&seekTo=" + "end"
-//					+ "&groupId=" + consumerGroup)
-//					.bean(RiskValidationBean.class,"createIncident")
-//					.log("${body}")
-//					.setHeader(Exchange.HTTP_METHOD, constant("POST"))
-//					.setHeader("Authorization",constant("Basic YWRtaW46SzJlc1RXcVdkcDRF"))
-//					.setHeader("Content-Type",constant("application/json"))
-//					.choice()
-//					.when(body().isNotNull())
-//					.toD("https4://dev73376.service-now.com/api/now/v1/table/incident")
-//					.to("kafka:"+"inc"+"?brokers=" + kafkaBootstrap)
-//					.log("${body}")
-//					.otherwise()
-//			.log("skipped incident creation");
+
+			from("kafka:" + "crtincident" + "?brokers=" + kafkaBootstrap + "&maxPollRecords="
+					+ consumerMaxPollRecords + "&seekTo=" + "end"
+					+ "&groupId=" + consumerGroup)
+					.bean(RiskValidationBean.class,"createIncident")
+					.log("${body}")
+					.setHeader(Exchange.HTTP_METHOD, constant("POST"))
+					.setHeader("Authorization",constant("Basic YWRtaW5Vc2VyOlJlZEhhdA=="))
+					.setHeader("Content-Type",constant("application/json"))
+					.choice()
+					.when(body().isNotNull())
+					.toD("http://rhpam-trial-kieserver-http-self-healing.apps.cluster-fc8n8.fc8n8.sandbox93.opentlc.com/services/rest/server/containers/Workflows_1.0.0-SNAPSHOT/processes/Workflows.FailedPlaybook/instances")
+			        .to("kafka:"+"inc"+"?brokers=" + kafkaBootstrap)
+					.log("${body}")
+					.otherwise()
+			.log("skipped incident creation");
 
 
 			from("kafka:" + "failed-decision" + "?brokers=" + kafkaBootstrap + "&maxPollRecords="
@@ -66,10 +66,11 @@ public class RiskValidationRouteBuilder extends RouteBuilder {
 					.bean(RiskValidationBean.class,"createIncident")
 					.log("${body}")
 					.setHeader(Exchange.HTTP_METHOD, constant("POST"))
-					.setHeader("Authorization",constant("Basic YWRtaW46TmZzN29Va0ZtOEFH"))
+					.setHeader("Authorization",constant("Basic YWRtaW5Vc2VyOlJlZEhhdA=="))
 					.setHeader("Content-Type",constant("application/json"))
-					.toD("https4://dev65938.service-now.com/api/now/v1/table/incident")
-			        .to("kafka:"+"inc"+"?brokers=" + kafkaBootstrap)
+					.toD("http://rhpam-trial-kieserver-http-self-healing.apps.cluster-fc8n8.fc8n8.sandbox93.opentlc.com/services/rest/server/containers/Workflows_1.0.0-SNAPSHOT/processes/Workflows.FailedEvent/instances")
+			        .log("${body}")
+					.to("kafka:"+"inc"+"?brokers=" + kafkaBootstrap)
 			.log("${body}")
 
 					;

@@ -11,6 +11,7 @@ import org.jboss.resteasy.client.jaxrs.ResteasyClient;
 import org.jboss.resteasy.client.jaxrs.ResteasyClientBuilder;
 import org.jboss.resteasy.client.jaxrs.ResteasyWebTarget;
 import org.jboss.resteasy.client.jaxrs.engines.URLConnectionEngine;
+import org.json.JSONObject;
 import org.kie.api.KieServices;
 import org.kie.api.runtime.KieContainer;
 import org.kie.dmn.api.core.*;
@@ -31,7 +32,6 @@ public class RiskValidationBean {
 
 	private final KieContainer kieContainer;
 
-
 	@Autowired
 	public RiskValidationBean(KieContainer kieContainer) {
 		LOG.info("Initializing a new session.");
@@ -40,8 +40,6 @@ public class RiskValidationBean {
 
 	public String prepareAnsibleRequest(Exchange exchange) {
 
-
-
 		DMNRuntime dmnRuntime = RuleSessionFactory.createDMNRuntime();
 		String status = exchange.getIn().getBody().toString();
 
@@ -49,43 +47,48 @@ public class RiskValidationBean {
 		String modelName = "CreateIncidentCheck";
 		DMNModel dmnModel = dmnRuntime.getModel(namespace, modelName);
 
-
 		SensuEvents sensuEvents = new SensuEvents();
 
-		System.out.println("sensuEvents"+status);
+		System.out.println("sensuEvents" + status);
 
-		String jsonRequest = "{\"incidentCreatedDate\":15953904000000, \"incidentCreated\":false, \"status\":"+status+",\"currentDate\":"+new Date().getTime()+"}";
+		String jsonRequest = "{\"incidentCreatedDate\":15953904000000, \"incidentCreated\":false, \"status\":" + status
+				+ ",\"currentDate\":" + new Date().getTime() + "}";
 
-		System.out.println("jsonRequest"+jsonRequest);
+		System.out.println("jsonRequest" + jsonRequest);
 
 		DMNContext dmnContext = dmnRuntime.newContext();
 		dmnContext.set("Playbook Event", jsonRequest);
-
 
 		DMNResult dmnResult = dmnRuntime.evaluateAll(dmnModel, dmnContext);
 
 		DMNDecisionResult createIncident = dmnResult.getDecisionResultByName("Create Incident");
 
 		return createIncident.getResult().toString();
-    }
+	}
 
 	public String createIncident(Exchange exchange) {
-
 
 		System.out.println("inside block");
 		String status = exchange.getIn().getBody().toString();
 
 		System.out.println("sensuEvents" + status);
-		String host = exchange.getIn().getHeader("kafka.KEY").toString();
+		String serviceNowApiCall = null;
 
-//		SensuEvents sensuEvents = new Gson().fromJson(status,SensuEvents.class);
+		if (status.compareToIgnoreCase("false") != 0) {
 
-		String serviceNowApiCall = "{'short_description':'Issue needs assistance - Event : "+host+"- Automation Remediation Failed ','assignment_group':'287ebd7da9fe198100f92cc8d1d2154e'," +
-				"'urgency':'2','impact':'2'}";
-		System.out.println(serviceNowApiCall);
+			String host = exchange.getIn().getHeader("kafka.KEY").toString();
+
+			// SensuEvents sensuEvents = new Gson().fromJson(status,SensuEvents.class);
+
+			serviceNowApiCall = "{ \"short_description\": \"Issue needs assistance - Event : " + host
+					+ "- Automation Remediation Failed\","
+					+ "\"urgency\": \"2\","
+					+ "\"impact\": \"2\","
+					+ "\"assignment_group\": \"IT Help Desk\"}";
+			System.out.println(serviceNowApiCall);
+		}
 		return serviceNowApiCall;
 
 	}
 
-
-	}
+}

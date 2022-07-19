@@ -106,6 +106,13 @@
       <artifactId>camel-http4-starter</artifactId>
       <version>2.23.2.fuse-740011-redhat-00001</version>
     </dependency>
+
+
+    <dependency>
+      <groupId>org.apache.camel</groupId>
+      <artifactId>camel-http</artifactId>
+      <version>${camel.version}</version>
+    </dependency>
     <!-- https://mvnrepository.com/artifact/org.drools/drools-decisiontables -->
 
     <!-- Fuse Camel -->

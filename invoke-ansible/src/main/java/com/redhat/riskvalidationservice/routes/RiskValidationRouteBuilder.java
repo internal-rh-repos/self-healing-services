@@ -66,7 +66,7 @@ public class RiskValidationRouteBuilder extends RouteBuilder {
 					+ "&groupId=" + consumerGroup).id("apbEvents")
 			.bean(RiskValidationBean.class,"prepareAnsibleRequest")
 					.setHeader(Exchange.HTTP_METHOD, constant("POST"))
-					.setHeader("Authorization",constant("Bearer 85KV1a0nfX1vnMhO3fLQhjGoe7QApO"))
+					.setHeader("Authorization",constant("Bearer  Cl5Ffl1ieyxcs00sWbcjST13gfvXGo"))
 					.setHeader("Content-Type",constant("application/json"))
 					.toD("https4://"+ansibleTowerUrl+"/api/v2/job_templates/${header.apbName}/launch/")
 					.bean(RiskValidationBean.class,"readAnsibleResponse")

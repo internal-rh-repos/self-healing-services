@@ -1,0 +1,5 @@
+elastic-connector/target
+check-incident/target
+check-event-service/target
+ansible-service/target
+invoke-ansible/target
